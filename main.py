@@ -32,7 +32,7 @@ plt.figure(figsize=(10, 6))
 n, bins, patches = plt.hist(
     ages, bins=np.arange(18, 79, 5), color="steelblue", alpha=0.7, edgecolor="black"
 )
-plt.xticks(np.arange(min(bins), max(bins)+1, 5.0))
+plt.xticks(np.arange(min(bins), max(bins) + 1, 5.0))
 plt.title("Customer Age Distribution in Online Store", fontsize=16, fontweight="bold")
 plt.xlabel("Age (years)", fontsize=12)
 plt.ylabel("Number of Customers", fontsize=12)
@@ -94,17 +94,35 @@ print("\n" + "=" * 60)
 print("GRAPH 2: SCATTERPLOT - Product Price vs Sales Volume")
 print("=" * 60)
 
-# Generate fake data
+# Generate fake data with specific patterns for each category
 np.random.seed(123)
 n_products = 80
-prices = np.random.uniform(10, 200, n_products)
-# Inverse relationship: higher price, lower sales (with some noise)
-base_sales = 1000 - (prices * 3) + np.random.normal(0, 100, n_products)
-sales = np.maximum(base_sales, 50)  # Minimum 50 units sold
 
-# Create categories
-categories = np.random.choice(["Electronics", "Clothing", "Books", "Home"], n_products)
-colors = {"Electronics": "red", "Clothing": "blue", "Books": "green", "Home": "orange"}
+# Create category-specific data
+n_electronics = 25
+n_clothing = 30
+n_books = 25
+
+# Electronics: High prices (100-200), Low sales (200-600)
+electronics_prices = np.random.uniform(100, 200, n_electronics)
+electronics_sales = np.random.uniform(200, 600, n_electronics)
+
+# Books: Low prices (10-80), High sales (600-1200)
+books_prices = np.random.uniform(10, 80, n_books)
+books_sales = np.random.uniform(600, 1200, n_books)
+
+# Clothing: Medium prices (50-140), Medium sales (400-900)
+clothing_prices = np.random.uniform(50, 140, n_clothing)
+clothing_sales = np.random.uniform(400, 900, n_clothing)
+
+# Combine all data
+prices = np.concatenate([electronics_prices, clothing_prices, books_prices])
+sales = np.concatenate([electronics_sales, clothing_sales, books_sales])
+categories = np.array(
+    ["Electronics"] * n_electronics + ["Clothing"] * n_clothing + ["Books"] * n_books
+)
+
+colors = {"Electronics": "red", "Clothing": "blue", "Books": "green"}
 
 plt.figure(figsize=(12, 8))
 for category in colors.keys():
@@ -132,7 +150,7 @@ plt.show()
 # Data Analysis
 df_products = pd.DataFrame({"Price": prices, "Sales": sales, "Category": categories})
 
-print("\n📊 DATA VALUES:")
+print("\n📦 DATA VALUES:")
 print(f"Total products analyzed: {n_products}")
 print(f"Price range: ${prices.min():.2f} - ${prices.max():.2f}")
 print(f"Sales range: {sales.min():.0f} - {sales.max():.0f} units")
@@ -154,9 +172,8 @@ print("\n🎨 LEGEND:")
 print("• Red dots: Electronics")
 print("• Blue dots: Clothing")
 print("• Green dots: Books")
-print("• Orange dots: Home products")
 
-print("\n📈 COMPARISONS:")
+print("\n🚀 COMPARISONS:")
 category_avg_price = (
     df_products.groupby("Category")["Price"].mean().sort_values(ascending=False)
 )
@@ -166,7 +183,7 @@ for i, (category, price) in enumerate(category_avg_price.items(), 1):
 
 print("\n❓ QUESTIONS:")
 print("1. (Multiple Choice) Which category generally has the highest prices?")
-print("   a) Electronics  b) Clothing  c) Books  d) Home")
+print("   a) Electronics  b) Clothing  c) Books")
 print("   Answer: a) Electronics")
 print(
     "\n2. (True/False) There is a positive correlation between price and sales volume."
@@ -182,7 +199,7 @@ print("GRAPH 3: LINE CHART - Monthly Revenue Over 2 Years")
 print("=" * 60)
 
 # Generate fake data
-months = pd.date_range("2022-01-01", "2023-12-31", freq="M")
+months = pd.date_range("2022-01-01", "2023-12-31", freq="ME")
 np.random.seed(456)
 
 # Base revenue with seasonal trends
@@ -265,13 +282,12 @@ print(
 )
 
 print("\n❓ QUESTIONS:")
-print("1. (Multiple Choice) Which year had higher total revenue?")
-print("   a) 2022  b) 2023  c) Same  d) Cannot determine")
-print("   Answer: b) 2023")
+print("1. (Multiple Choice) Which year had highest total revenue?")
+print("   Answer: 2023")
 print("\n2. (True/False) Revenue shows a general upward trend over the 2-year period.")
 print("   Answer: True")
-print("\n3. (Short Answer) What is the approximate average monthly revenue?")
-print(f"   Answer: ${revenue.mean():,.0f}")
+print("\n3. (Short Answer) What was the lowest revenue?")
+print(f"   Answer: ${revenue.min():,.0f}")
 
 # %%
 # GRAPH 4: BAR CHART - Sales Performance by Region
@@ -351,8 +367,8 @@ print("   a) North America  b) Europe  c) Asia Pacific  d) Latin America")
 print("   Answer: c) Asia Pacific")
 print("\n2. (True/False) Europe outperformed North America in sales.")
 print("   Answer: False")
-print("\n3. (Short Answer) What is the total global sales amount?")
-print(f"   Answer: ${total_sales:,.0f}")
+print("\n3. (Short Answer) What was the sales volume of Latin America?")
+print(f"   Answer: ${sales_values[3]:,.0f}")
 
 # %%
 # GRAPH 5: PIE CHART - Market Share by Company
@@ -366,21 +382,34 @@ market_shares = [28.5, 22.3, 18.7, 12.8, 9.2, 8.5]
 colors_pie = ["#ff9999", "#66b3ff", "#99ff99", "#ffcc99", "#ff99cc", "#c2c2f0"]
 
 plt.figure(figsize=(10, 10))
-wedges, texts, autotexts = plt.pie(
+wedges, texts = plt.pie(
     market_shares,
-    labels=companies,
+    labels=None,  # Remove default labels
     colors=colors_pie,
-    autopct="%1.1f%%",
+    autopct=None,  # Hide percentages
     startangle=90,
-    explode=(0.05, 0, 0, 0, 0, 0),
-)  # Explode the largest slice
+    explode=None,  # No exploded slices
+)
 
 plt.title("Market Share by Company", fontsize=16, fontweight="bold", pad=20)
 
-# Enhance text formatting
-for autotext in autotexts:
-    autotext.set_color("black")
-    autotext.set_fontweight("bold")
+# Add company names inside slices
+for i, (wedge, company) in enumerate(zip(wedges, companies)):
+    angle = (wedge.theta2 + wedge.theta1) / 2
+    x = 0.6 * np.cos(np.radians(angle))
+    y = 0.6 * np.sin(np.radians(angle))
+    plt.text(
+        x,
+        y,
+        company,
+        ha="center",
+        va="center",
+        fontsize=15,
+        fontweight="bold",
+        color="black",
+    )
+
+# No percentage text formatting needed since autopct=None
 
 plt.axis("equal")
 plt.tight_layout()
@@ -390,7 +419,7 @@ plt.show()
 # Data Analysis
 df_market = pd.DataFrame({"Company": companies, "Market_Share": market_shares})
 
-print("\n📊 DATA VALUES:")
+print("\n📦 DATA VALUES:")
 print("Market share breakdown:")
 for company, share in zip(companies, market_shares):
     print(f"• {company}: {share}%")
@@ -407,7 +436,7 @@ color_names = [
 for company, color in zip(companies, color_names):
     print(f"• {color}: {company}")
 
-print("\n📈 COMPARISONS:")
+print("\n🚀 COMPARISONS:")
 sorted_market = df_market.sort_values("Market_Share", ascending=False)
 print("Companies by market share (largest to smallest):")
 for i, (_, row) in enumerate(sorted_market.iterrows(), 1):
@@ -431,183 +460,108 @@ print(
 print(f"   Answer: {sorted_market.head(2)['Market_Share'].sum():.1f}%")
 
 # %%
-# GRAPH 6: BUBBLE CHART - Country Population vs GDP per Capita
+# GRAPH 6: STACKED BAR CHART - Plant Composition Comparison
 print("\n" + "=" * 60)
-print("GRAPH 6: BUBBLE CHART - Country Population vs GDP per Capita")
+print("GRAPH 6: STACKED BAR CHART - Plant Composition Comparison")
 print("=" * 60)
 
-# Generate fake data
-countries = [
-    "USA",
-    "China",
-    "India",
-    "Germany",
-    "Japan",
-    "Brazil",
-    "UK",
-    "France",
-    "Italy",
-    "Canada",
-    "South Korea",
-    "Australia",
-    "Mexico",
-    "Spain",
-    "Indonesia",
-]
-np.random.seed(101112)
+# Generate fake data for 4 plants (each totaling 100%)
+plants = ["Sunflower", "Oak Tree", "Rose Bush", "Tomato Plant"]
+np.random.seed(202324)
 
-populations = np.array(
-    [331, 1439, 1380, 83, 126, 213, 67, 68, 60, 38, 52, 26, 129, 47, 274]
-)  # millions
-gdp_per_capita = np.array(
-    [
-        65000,
-        12000,
-        2500,
-        53000,
-        42000,
-        9000,
-        47000,
-        45000,
-        36000,
-        52000,
-        35000,
-        62000,
-        11000,
-        30000,
-        4500,
-    ]
-)  # USD
+# Plant composition by parts (percentages that sum to 100% for each plant)
+roots_pct = [18, 23, 26, 25]  # Roots percentage for each plant
+stem_pct = [55, 40, 30, 45]  # Stem percentage for each plant
+leaves_pct = [27, 37, 44, 30]  # Leaves percentage for each plant
 
-# Bubble size represents total GDP (population * gdp_per_capita)
-bubble_sizes = (populations * gdp_per_capita) / 1000  # Scale down for visualization
+# Verify each plant sums to 100%
+for i, plant in enumerate(plants):
+    total = roots_pct[i] + stem_pct[i] + leaves_pct[i]
+    assert total == 100, f"{plant} doesn't sum to 100%"
 
-# Color by continent (simplified)
-continents = [
-    "N.America",
-    "Asia",
-    "Asia",
-    "Europe",
-    "Asia",
-    "S.America",
-    "Europe",
-    "Europe",
-    "Europe",
-    "N.America",
-    "Asia",
-    "Oceania",
-    "N.America",
-    "Europe",
-    "Asia",
-]
-continent_colors = {
-    "N.America": "red",
-    "Asia": "blue",
-    "Europe": "green",
-    "S.America": "orange",
-    "Oceania": "purple",
-}
+# Create stacked bar chart
+fig, ax = plt.subplots(figsize=(12, 8))
 
-plt.figure(figsize=(14, 10))
-for continent in continent_colors.keys():
-    mask = [c == continent for c in continents]
-    if any(mask):
-        plt.scatter(
-            [populations[i] for i in range(len(mask)) if mask[i]],
-            [gdp_per_capita[i] for i in range(len(mask)) if mask[i]],
-            s=[bubble_sizes[i] for i in range(len(mask)) if mask[i]],
-            c=continent_colors[continent],
-            alpha=0.6,
-            label=continent,
-            edgecolors="black",
-            linewidth=1,
-        )
+# Define colors for each category
+colors = ["#FF6B6B", "#4ECDC4", "#45B7D1"]
 
-# Add country labels for selected points
-for i, country in enumerate(countries):
-    if country in ["USA", "China", "India", "Germany", "Japan"]:
-        plt.annotate(
-            country,
-            (populations[i], gdp_per_capita[i]),
-            xytext=(5, 5),
-            textcoords="offset points",
-            fontsize=9,
-            fontweight="bold",
-        )
-
-plt.title(
-    "Country Population vs GDP per Capita\n(Bubble size = Total GDP)",
-    fontsize=16,
-    fontweight="bold",
+# Create the stacked bars
+bars1 = ax.bar(plants, roots_pct, color=colors[0], label="Roots")
+bars2 = ax.bar(plants, stem_pct, bottom=roots_pct, color=colors[1], label="Stem")
+bars3 = ax.bar(
+    plants,
+    leaves_pct,
+    bottom=[r + s for r, s in zip(roots_pct, stem_pct)],
+    color=colors[2],
+    label="Leaves",
 )
-plt.xlabel("Population (millions)", fontsize=12)
-plt.ylabel("GDP per Capita (USD)", fontsize=12)
-plt.legend(title="Continent", title_fontsize=12)
-plt.grid(True, alpha=0.3)
+
+plt.title("Plant Composition Comparison", fontsize=16, fontweight="bold")
+plt.xlabel("Plant Type", fontsize=12)
+plt.ylabel("Percentage of Total Plant Mass (%)", fontsize=12)
+plt.legend(title="Plant Parts", title_fontsize=12, loc="center left", bbox_to_anchor=(1, 0.5))
+plt.grid(True, alpha=0.3, axis="y")
+
+plt.ylim(0, 100)
 plt.tight_layout()
-plt.savefig("graphs/bubblechart_population_gdp.png", dpi=300, bbox_inches="tight")
+plt.savefig("graphs/stackedbar_plant_composition.png", dpi=300, bbox_inches="tight")
 plt.show()
 
 # Data Analysis
-df_countries = pd.DataFrame(
+df_plants = pd.DataFrame(
     {
-        "Country": countries,
-        "Population": populations,
-        "GDP_per_Capita": gdp_per_capita,
-        "Total_GDP": populations * gdp_per_capita,
-        "Continent": continents,
+        "Plant": plants,
+        "Roots": roots_pct,
+        "Stem": stem_pct,
+        "Leaves": leaves_pct,
     }
 )
 
-print("\n📊 DATA VALUES:")
-print(f"Countries analyzed: {len(countries)}")
-print(f"Population range: {populations.min():.0f} - {populations.max():.0f} million")
-print(
-    f"GDP per capita range: ${gdp_per_capita.min():,.0f} - ${gdp_per_capita.max():,.0f}"
-)
-
-print("\nTop 5 countries by total GDP:")
-top_gdp = df_countries.nlargest(5, "Total_GDP")
-for _, row in top_gdp.iterrows():
-    print(f"• {row['Country']}: ${row['Total_GDP']:,.0f} million")
+print("\n📦 DATA VALUES:")
+print("Plant composition breakdown (percentage of total plant mass):")
+for i, plant in enumerate(plants):
+    print(f"\n{plant}:")
+    print(f"  • Roots: {roots_pct[i]}%")
+    print(f"  • Stem: {stem_pct[i]}%")
+    print(f"  • Leaves: {leaves_pct[i]}%")
 
 print("\n🎨 LEGEND:")
-print("• Red bubbles: North America")
-print("• Blue bubbles: Asia")
-print("• Green bubbles: Europe")
-print("• Orange bubbles: South America")
-print("• Purple bubbles: Oceania")
-print("• Bubble size represents total GDP (larger = higher total GDP)")
+print("• Red: Roots")
+print("• Teal: Stem")
+print("• Blue: Leaves")
 
-print("\n📈 COMPARISONS:")
-richest_countries = df_countries.nlargest(3, "GDP_per_Capita")
-print("Countries by GDP per capita (highest to lowest):")
-for i, (_, row) in enumerate(richest_countries.iterrows(), 1):
-    print(f"{i}. {row['Country']}: ${row['GDP_per_Capita']:,.0f}")
+print("\n🚀 COMPARISONS:")
+# Calculate average percentages across plants
+avg_roots = np.mean(roots_pct)
+avg_stem = np.mean(stem_pct)
+avg_leaves = np.mean(leaves_pct)
 
-largest_populations = df_countries.nlargest(3, "Population")
-print("\nCountries by population (largest to smallest):")
-for i, (_, row) in enumerate(largest_populations.iterrows(), 1):
-    print(f"{i}. {row['Country']}: {row['Population']:.0f} million")
+parts_avg = [
+    ("Roots", avg_roots),
+    ("Stem", avg_stem),
+    ("Leaves", avg_leaves),
+]
+parts_avg.sort(key=lambda x: x[1], reverse=True)
 
-print("\n❓ QUESTIONS:")
-print("1. (Multiple Choice) Which country has the highest GDP per capita?")
-print("   a) USA  b) Germany  c) Australia  d) Canada")
-print("   Answer: a) USA")
+print("Plant parts by average composition (highest to lowest):")
+for i, (part, avg_pct) in enumerate(parts_avg, 1):
+    print(f"{i}. {part}: {avg_pct:.1f}%")
+
+print("\nPlant characteristics:")
+print(f"• Oak Tree has the highest stem percentage ({max(stem_pct)}%)")
+print(f"• Tomato Plant has the most leaves ({max(leaves_pct)}%)")
+print("• Rose Bush has balanced composition across all parts")
+
+print("\n🤔 QUESTIONS:")
 print(
-    "\n2. (True/False) China has both the largest population and highest GDP per capita."
+    "1. (Multiple Choice) Which plant part has the lowest average percentage across all plants?"
 )
-print("   Answer: False (largest population but not highest GDP per capita)")
-print("\n3. (Short Answer) What does the bubble size represent in this chart?")
-print("   Answer: Total GDP (Population × GDP per capita)")
+print("   a) Roots  b) Stem  c) Leaves")
+print("   Answer: a) Roots")
+print("\n2. (True/False) Oak Tree has the highest stem percentage among all plants.")
+print("   Answer: False")
+print(
+    "\n3. (Short Answer) Which plant has the most balanced composition across all parts?"
+)
+print("   Answer: Tomato Plant")
 
-print("\n" + "=" * 60)
-print("ALL GRAPHS COMPLETED AND SAVED!")
-print("=" * 60)
-print("📁 Graph files saved in 'graphs/' folder:")
-print("• histogram_customer_ages.png")
-print("• scatterplot_price_vs_sales.png")
-print("• linechart_monthly_revenue.png")
-print("• barchart_regional_sales.png")
-print("• piechart_market_share.png")
-print("• bubblechart_population_gdp.png")
